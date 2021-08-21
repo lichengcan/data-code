@@ -6,4 +6,5 @@
 * 平衡二叉树 io.github.chenshun00.data.Node.AVLTree
   * [平衡二叉树的实现](https://www.yuque.com/chenshun00/sbny2o/rxwtzp)
 * 红黑树 io.github.chenshun00.data.Node.RedBlackTree
+  * [红黑树的实现](https://www.yuque.com/chenshun00/sbny2o/dey8sg)
 
