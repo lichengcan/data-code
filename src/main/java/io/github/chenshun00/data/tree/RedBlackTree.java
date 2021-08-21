@@ -224,7 +224,6 @@ public class RedBlackTree {
             node.data = next.data;
             //到这里为止next节点就消失了，相当于删除了next节点
             //重新对next节点的parent节点进行平衡操作
-            //把这里解决了，红黑树的删除问题就解决了，在解决之前，我觉得可以先溜一下理论问题。
             if (parent.leftChild == null) {
                 parent.leftChild = new Node(true, parent, null, null, null);
                 parent.leftChild.nil = true;
