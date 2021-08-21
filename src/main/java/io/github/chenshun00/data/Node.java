@@ -21,7 +21,7 @@ public class Node {
     /**
      * AVL 树使用
      */
-    public Node(Node leftChild, Node rightChild, Node parent, Integer data, Integer height) {
+    public Node(Node parent, Node leftChild, Node rightChild, Integer data, Integer height) {
         type = "AVL";
         this.leftChild = leftChild;
         this.rightChild = rightChild;
@@ -58,7 +58,7 @@ public class Node {
 
     public String getMsg() {
         if (type.equals("AVL")) {
-            return data + "(" + colorStr(String.valueOf(height)) + ")";
+            return data + "" + colorStr(String.valueOf(height)) + "";
         }
         if (type.equals("RB")) {
             String data = this.data == null ? "N" : this.data.toString();

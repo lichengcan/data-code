@@ -1,9 +1,10 @@
 package io.github.chenshun00.data.tree;
 
 import io.github.chenshun00.data.Node;
+import io.github.chenshun00.data.print.TreePrinter;
 
 /**
- * @author chenshun00@gmail.com
+ * @author luobo.cs@raycloud.com
  * @since 2021/8/14 10:26 上午
  */
 public class AVLTree {
@@ -15,10 +16,10 @@ public class AVLTree {
         avlTree.insert(1);
         avlTree.insert(2);
         avlTree.insert(3);
-//        avlTree.insert(4);
-//        avlTree.insert(5);
-//        avlTree.insert(6);
-//        avlTree.insert(7);
+        avlTree.insert(4);
+        avlTree.insert(5);
+        avlTree.insert(6);
+        avlTree.insert(7);
 //        avlTree.insert(8);
 //        avlTree.insert(9);
 //        avlTree.insert(999);
@@ -97,8 +98,8 @@ public class AVLTree {
     }
 
     public void traverse() {
-        doTraverse(root);
-        System.out.println();
+        TreePrinter.printNode(root);
+        System.out.println("==================================================");
     }
 
     //==============================删================================
@@ -407,19 +408,6 @@ public class AVLTree {
     }
 
     //===========================遍历===========================
-    private void doTraverse(Node node) {
-        if (node == null) {
-            System.out.println("么数据");
-            return;
-        }
-        if (node.leftChild != null) {
-            doTraverse(node.leftChild);
-        }
-        System.out.print(node.data + "(" + node.height + ")" + "\t");
-        if (node.rightChild != null) {
-            doTraverse(node.rightChild);
-        }
-    }
     //===========================旋转===========================
 
     /**
