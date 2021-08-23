@@ -14,7 +14,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class BTree {
 
     public static void main(String[] args) {
-        BTree bTree = new BTree(3);
+        BTree bTree = new BTree(5);
         bTree.insert(1200);
         bTree.insert(1300);
         bTree.insert(1400);
@@ -26,14 +26,14 @@ public class BTree {
         bTree.insert(2000);
         bTree.insert(2100);
         bTree.insert(2200);
-//        bTree.insert(2300);
-//        bTree.insert(2400);
-//        bTree.insert(2500);
-//        bTree.insert(2600);
-//        bTree.insert(2700);
-//        bTree.insert(2800);
-//        bTree.insert(2900);
-//        bTree.insert(3000);
+        bTree.insert(2300);
+        bTree.insert(2400);
+        bTree.insert(2500);
+        bTree.insert(2600);
+        bTree.insert(2700);
+        bTree.insert(2800);
+        bTree.insert(2900);
+        bTree.insert(3000);
         bTree.traverse();
     }
 
@@ -74,8 +74,6 @@ public class BTree {
         final int indexValue = key[childIndex];
         //root节点需要进行抽离
         if (isRoot) {
-
-
             Node newRoot = new Node();
             newRoot.setData(indexValue);
             root = newRoot;
@@ -160,11 +158,17 @@ public class BTree {
             final Node[] nodeChildren = node.children;
             if (nodeChildren != null) {
                 //进行分裂
-                leftChild.children = new Node[parentChildIndex + 1];
+                leftChild.children = new Node[leftChild.numberOfNodes + 1];
                 //进行拷贝
-                System.arraycopy(children, 0, leftChild.children, 0, parentChildIndex + 1);
-                rightChild.children = new Node[children.length - parentChildIndex - 1];
-                System.arraycopy(children, parentChildIndex + 1, rightChild.children, 0, children.length - parentChildIndex - 1);
+                System.arraycopy(nodeChildren, 0, leftChild.children, 0, leftChild.numberOfNodes + 1);
+                for (Node child : leftChild.children) {
+                    child.parent = leftChild;
+                }
+                rightChild.children = new Node[nodeChildren.length - leftChild.numberOfNodes - 1];
+                System.arraycopy(nodeChildren, leftChild.numberOfNodes + 1, rightChild.children, 0, nodeChildren.length - leftChild.numberOfNodes - 1);
+                for (Node child : rightChild.children) {
+                    child.parent = rightChild;
+                }
             }
             if (parent.key.length >= m) {
                 //在二次迭代中，需要将当前树的孩子的子树修改为新生成的子树的孩子
@@ -204,11 +208,7 @@ public class BTree {
     }
 
     public void traverse() {
-        if (root == null) {
-            System.out.println();
-            System.out.println("======");
-            return;
-        }
+        if (root == null) return;
         var queue = new LinkedBlockingQueue<>();
         queue.add(root);
         while (!queue.isEmpty()) {
@@ -246,20 +246,15 @@ public class BTree {
     }
 
     private void doTraverse(Node node) {
-        if (node == null || node.key == null) {
-            return;
-        }
+        if (node == null || node.key == null) return;
         final int[] key = node.key;
         final int level = maxLevel(node);
-
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("     ".repeat(Math.max(0, level))).append("[");
         for (int j : key) {
             stringBuilder.append(j).append(",");
         }
-        stringBuilder.delete(stringBuilder.length() - 1, stringBuilder.length());
-//        stringBuilder.append("(").append(node.isLeaf() ? "Y" : "N").append(")");
-        stringBuilder.append("]");
+        stringBuilder.delete(stringBuilder.length() - 1, stringBuilder.length()).append("]");
         System.out.print(stringBuilder.toString());
     }
 
