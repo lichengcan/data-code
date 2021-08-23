@@ -77,9 +77,7 @@ public class BTree {
             Node newRoot = new Node();
             newRoot.setData(indexValue);
             root = newRoot;
-
-            //当切节点分裂成2个节点
-            //做节点
+            //当节点分裂成2个节点 拷贝左边数据到left节点 拷贝右边数据到right节点
             Node leftChild = new Node();
             leftChild.key = new int[childIndex];
             System.arraycopy(node.key, 0, leftChild.key, 0, childIndex);
@@ -92,17 +90,18 @@ public class BTree {
             rightChild.trim();
             rightChild.parent = root;
 
+            //节点修正，一开始的root只有2个孩子,直接用0和1使用即可
             root.trim();
-            //修改新节点
             root.setChild(0, leftChild);
             root.setChild(1, rightChild);
 
             final Node[] children = node.children;
+            //如果当前节点的孩子不为空，需要对孩子的指向进行修改，分别把node的一部分指向修改到left，一部分修改到right
             if (children != null) {
-                //进行分裂
-                leftChild.children = new Node[childIndex + 1];
                 //进行拷贝
+                leftChild.children = new Node[childIndex + 1];
                 System.arraycopy(children, 0, leftChild.children, 0, childIndex + 1);
+                //孩子节点指向parent节点
                 for (Node child : leftChild.children) {
                     child.parent = leftChild;
                 }
@@ -125,7 +124,6 @@ public class BTree {
             parent.setData(indexValue);
 
             //当切节点分裂成2个节点
-            //做节点
             Node leftChild = new Node();
             leftChild.key = new int[childIndex];
             System.arraycopy(node.key, 0, leftChild.key, 0, childIndex);
