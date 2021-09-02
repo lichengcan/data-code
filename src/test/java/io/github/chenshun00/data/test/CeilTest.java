@@ -7,8 +7,12 @@ package io.github.chenshun00.data.test;
 public class CeilTest {
 
     public static void main(String[] args) {
-        final int ceil = (int) Math.ceil(4 / 2) -1;
+        System.out.println();
+        final int ceil = (int) Math.ceil(5 / 2.0) ;
         System.out.println(ceil);
+        System.out.println(Math.ceil(5 / 2)-1);
+
+        System.out.println((int)Math.ceil(2.3));
     }
 
 }
