@@ -4,7 +4,7 @@ import io.github.chenshun00.data.Node;
 import io.github.chenshun00.data.print.TreePrinter;
 
 /**
- * @author luobo.cs@raycloud.com
+ * @author chenshun00@gmail.com
  * @since 2021/8/14 10:26 上午
  */
 public class AVLTree {

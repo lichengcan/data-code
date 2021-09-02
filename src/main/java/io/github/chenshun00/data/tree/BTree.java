@@ -10,7 +10,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 /**
  * <a href="https://stackoverflow.com/questions/5890960/print-btree-by-level">print-btree-by-level</a>
  *
- * @author luobo.cs@raycloud.com
+ * @author chenshun00@gmail.com
  * @since 2021/8/22 7:51 上午
  */
 public class BTree {

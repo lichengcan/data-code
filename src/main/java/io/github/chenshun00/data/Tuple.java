@@ -1,7 +1,7 @@
 package io.github.chenshun00.data;
 
 /**
- * @author luobo.cs@raycloud.com
+ * @author chenshun00@gmail.com
  * @since 2021/9/2 9:24 上午
  */
 public class Tuple<K, V> {
