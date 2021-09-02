@@ -1,5 +1,7 @@
 package io.github.chenshun00.data.tree;
 
+import io.github.chenshun00.data.Tuple;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -39,6 +41,9 @@ public class BTree {
         bTree.insert(3100);
         bTree.traverse();
 
+//        bTree.delete(2700);
+//        bTree.traverse();
+//
         bTree.delete(3000);
         bTree.delete(3100);
         bTree.delete(2900);
@@ -85,7 +90,7 @@ public class BTree {
 
     public boolean delete(int data) {
         //找节点
-        final Node node = findNode(root, data);
+        final Node node = findDeleteNode(root, data);
         if (node == null) {
             return false;
         }
@@ -102,16 +107,21 @@ public class BTree {
         }
         //处理叶子节点
         if (node.isLeaf()) {
-            handleNode(node, data);
+            handleExternalNode(node, data);
         } else {
             //处理非叶子节点
-            handleOtherNode(node, data);
+            handleInternalNode(node, data);
         }
         return true;
     }
 
-    //处理叶子节点
-    private void handleNode(Node node, int data) {
+    /**
+     * 处理外部节点(叶子节点)
+     *
+     * @param node 节点
+     * @param data 数据
+     */
+    private void handleExternalNode(Node node, int data) {
         //自己是富裕节点
         if (isWealthyNode(node)) {
             node.delete(data);
@@ -120,16 +130,19 @@ public class BTree {
             node.delete(data);
             final Node parent = node.parent;
             //找到兄弟节点
-            Node brother = findBrother(node);
+            final Tuple<Node, Boolean> tuple = findBrother(node);
+            Node brother = tuple.first;
+            final Boolean right = tuple.second;
             assert brother != null;
             final int parentMax = parent.getMax();
             //兄弟节点是富裕节点
             if (isWealthyNode(brother)) {
                 //parent 最大key下移
                 node.setData(parentMax);
-                final int brotherMax = brother.getMax();
+                final int brotherMax = right ? brother.getMin() : brother.getMax();
                 brother.delete(brotherMax);
                 //兄弟节点最大key上移
+                parent.delete(data);
                 parent.setData(brotherMax);
             } else {
                 //兄弟节点也是贫穷节点
@@ -176,14 +189,16 @@ public class BTree {
             node.delete(data);
             final Node parent = node.parent;
             //找到兄弟节点
-            Node brother = findBrother(node);
+            final Tuple<Node, Boolean> tuple = findBrother(node);
+            Node brother = tuple.first;
+            final Boolean right = tuple.second;
             assert brother != null;
             final int parentMax = parent.getMax();
             //兄弟节点是富裕节点
             if (isWealthyNode(brother)) {
                 //parent 最大key下移
                 node.setData(parentMax);
-                final int brotherMax = brother.getMax();
+                final int brotherMax = right ? brother.getMin() : brother.getMax();
                 brother.delete(brotherMax);
                 //兄弟节点最大key上移
                 parent.setData(brotherMax);
@@ -246,12 +261,45 @@ public class BTree {
         }
     }
 
-    //处理非叶子节点
-    private void handleOtherNode(Node node, int data) {
-
+    /**
+     * 处理内部节点(非叶子节点)
+     *
+     * @param node 节点
+     * @param data 数据
+     */
+    private void handleInternalNode(Node node, int data) {
+        int temp = -1;
+        for (int i = 0; i < node.key.length; i++) {
+            if (node.key[i] == data) {
+                temp = i;
+                break;
+            }
+        }
+        node.delete(data);
+        final Node maxNode = doFindLeafNode(node, temp);
+        final int max = maxNode.getMax();
+        node.setData(max);
+        handleExternalNode(maxNode, max);
     }
 
-    private Node findBrother(Node node) {
+    private Node doFindLeafNode(Node node, int index) {
+        Node child = node.children[index];
+        if (child.isLeaf()) {
+            return child;
+        }
+        while (!child.isLeaf()) {
+            child = child.children[child.numberOfNodes];
+        }
+        return child;
+    }
+
+    /**
+     * 找兄弟节点
+     *
+     * @param node 节点
+     * @return 兄弟节点信息，兄弟是左还是右
+     */
+    private Tuple<Node, Boolean> findBrother(Node node) {
         final Node parent = node.parent;
         int index = -1;
         for (int i = 0; i < parent.children.length; i++) {
@@ -262,9 +310,20 @@ public class BTree {
         }
         //取右兄弟
         if (index == 0) {
-            return parent.children[index + 1];
+            return new Tuple<>(parent.children[index + 1], true);
         } else {
-            return parent.children[index - 1];
+            final Node leftBro = parent.children[index - 1];
+            if (index + 1 >= parent.children.length) {
+                return new Tuple<>(leftBro, false);
+            }
+            final Node rightBro = parent.children[index + 1];
+            if (isWealthyNode(leftBro)) {
+                return new Tuple<>(leftBro, false);
+            }
+            if (isWealthyNode(rightBro)) {
+                return new Tuple<>(rightBro, true);
+            }
+            return new Tuple<>(leftBro, false);
         }
     }
 
@@ -396,6 +455,26 @@ public class BTree {
             return null;
         }
         return findNode(nextChild, data);
+    }
+
+    //这里的递归也可以用 while(next != null){ next = next.child();}的形式来解决
+    private Node findDeleteNode(Node node, int data) {
+        if (node == null) return null;
+        //如果root是叶子节点
+
+        final int max = node.getMax();
+
+        final int min = node.getMin();
+        if (data >= min && data <= max) {
+            return node;
+        }
+        //继续寻找叶子节点
+        //从root节点中寻找下继节点
+        final Node nextChild = nextChild(node, data);
+        if (nextChild == null) {
+            return null;
+        }
+        return findDeleteNode(nextChild, data);
     }
 
     /**
