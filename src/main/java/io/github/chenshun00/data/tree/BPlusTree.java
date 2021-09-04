@@ -8,85 +8,54 @@ import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
- * <a href="https://stackoverflow.com/questions/5890960/print-btree-by-level">print-btree-by-level</a>
- *
  * @author chenshun00@gmail.com
- * @since 2021/8/22 7:51 上午
+ * @since 2021/9/2 9:41 下午
  */
-public class BTree {
+public class BPlusTree {
 
     public static void main(String[] args) {
-        BTree bTree = new BTree(5);
-        bTree.insert(1000);
-        bTree.insert(1100);
-        bTree.insert(1200);
-        bTree.insert(1300);
-        bTree.insert(1400);
-        bTree.insert(1500);
-        bTree.insert(1600);
-        bTree.insert(1700);
-        bTree.insert(1800);
-        bTree.insert(1900);
-        bTree.insert(2000);
-        bTree.insert(2100);
-        bTree.insert(2200);
-        bTree.insert(2300);
-        bTree.insert(2400);
-        bTree.insert(2500);
-        bTree.insert(2600);
-        bTree.insert(2700);
-        bTree.insert(2800);
-        bTree.insert(2900);
-        bTree.insert(3000);
-        bTree.insert(3100);
-        bTree.traverse();
+        BPlusTree bPlusTree = new BPlusTree(5);
+        bPlusTree.insert(1000);
+        bPlusTree.insert(1100);
+        bPlusTree.insert(1200);
+        bPlusTree.insert(1300);
+        bPlusTree.insert(1400);
+        bPlusTree.insert(1500);
+        bPlusTree.insert(1600);
+        bPlusTree.insert(1700);
+        bPlusTree.insert(1800);
+        bPlusTree.insert(1900);
+        bPlusTree.insert(2000);
+        bPlusTree.insert(2100);
+        bPlusTree.insert(2200);
+        bPlusTree.insert(2300);
+        bPlusTree.insert(2400);
+        bPlusTree.insert(2500);
+        bPlusTree.insert(2600);
+        bPlusTree.insert(2700);
+        bPlusTree.insert(2800);
+        bPlusTree.insert(2900);
+        bPlusTree.insert(3000);
+        bPlusTree.insert(3100);
+        bPlusTree.traverse();
 
-//        bTree.delete(2700);
-//        bTree.traverse();
-//
-        bTree.delete(3000);
-        bTree.delete(3100);
-        bTree.delete(2900);
-        bTree.delete(2800);
-        bTree.delete(2700);
-        bTree.traverse();
-        bTree.delete(2600);
-        bTree.traverse();
-        bTree.delete(2500);
-        bTree.delete(2400);
-        bTree.traverse();
-        bTree.delete(2300);
-        bTree.traverse();
+        bPlusTree.delete(2700);
+        bPlusTree.delete(3100);
+        bPlusTree.delete(3000);
+        bPlusTree.delete(2500);
+        bPlusTree.delete(2800);
+        bPlusTree.delete(2900);
+        bPlusTree.delete(2600);
+        bPlusTree.delete(2400);
+        bPlusTree.delete(2300);
+        bPlusTree.delete(2200);
+        bPlusTree.delete(2100);
+        bPlusTree.delete(2000);
+        bPlusTree.delete(1900);
+        bPlusTree.traverse();
     }
-
-    //数据和孩子
-    // m/2<=数据<=m-1
-    // m/2<=孩子<=m-1
-    private final int m;
 
     private Node root;
-
-    public BTree(int m) {
-        this.m = m;
-    }
-
-    public void insert(int data) {
-        //如果root节点为空
-        if (root == null) {
-            root = new Node();
-            root.setData(data);
-            return;
-        }
-        //找到数据节点
-        final Node node = findNode(root, data);
-        assert node != null;
-        final int count = node.setData(data);
-        if (count <= m - 1) {
-            return;
-        }
-        //节点分裂
-        split(node, node == root);
-    }
 
     public boolean delete(int data) {
         //找节点
@@ -99,13 +68,7 @@ public class BTree {
             System.out.println("node不存在");
             return false;
         }
-        //处理叶子节点
-        if (node.isLeaf()) {
-            handleExternalNode(node, data);
-        } else {
-            //处理非叶子节点
-            handleInternalNode(node, data);
-        }
+        handleExternalNode(node, data);
         return true;
     }
 
@@ -133,11 +96,17 @@ public class BTree {
             if (isWealthyNode(brother)) {
                 //parent 最大key下移
                 node.setData(parentMax);
-                final int brotherMax = right ? brother.getMin() : brother.getMax();
+                int brotherMax = right ? brother.getMin() : brother.getMax();
                 brother.delete(brotherMax);
                 //兄弟节点最大key上移
-                parent.delete(data);
+                parent.delete(parentMax);
                 parent.setData(brotherMax);
+                //如果这次删除的数据包含在索引节点和叶子节点中
+                if (parentMax == brotherMax) {
+                    parent.delete(brotherMax);
+                    brotherMax = right ? brother.getMin() : brother.getMax();
+                    parent.setData(brotherMax);
+                }
             } else {
                 //兄弟节点也是贫穷节点
                 //先问parent一个节点 然后合并贫穷节点，修改指向，parent节点成为新的节点N
@@ -149,7 +118,10 @@ public class BTree {
                 for (int i : node.key) {
                     newNode.setData(i);
                 }
-                newNode.setData(parentMax);
+                if (parentMax != data) {
+                    newNode.setData(parentMax);
+                }
+
                 //节点合并完成了，修改指向
                 final Node[] children = parent.children;
 
@@ -162,12 +134,18 @@ public class BTree {
                 }
                 parent.children[parentChildIndex - 1] = newNode;
                 newNode.parent = parent;
+
                 Node[] newChildren = new Node[parentChildIndex];
                 System.arraycopy(parent.children, 0, newChildren, 0, parentChildIndex);
                 if (parentChildIndex < children.length - 1) {
                     System.arraycopy(parent.children, parentChildIndex + 1, newChildren, parentChildIndex, children.length - parentChildIndex - 1);
                 }
                 parent.children = newChildren;
+                if (parent.children[0].isLeaf()) {
+                    for (int i = 0; i < parent.children.length - 1; i++) {
+                        parent.children[i].next = parent.children[i + 1];
+                    }
+                }
                 parent.trim();
                 //向parent借了节点，现在要处理parent的情况，如果parent也有这种情况则需要额外进行处理
                 replace(parent, parentMax);
@@ -181,6 +159,14 @@ public class BTree {
             node.delete(data);
         } else {
             node.delete(data);
+            if (node == root) {
+                if (node.children.length == 1) {
+                    root = root.children[0];
+                    root.parent = null;
+                    root.trim();
+                }
+                return;
+            }
             final Node parent = node.parent;
             //找到兄弟节点
             final Tuple<Node, Boolean> tuple = findBrother(node);
@@ -192,10 +178,17 @@ public class BTree {
             if (isWealthyNode(brother)) {
                 //parent 最大key下移
                 node.setData(parentMax);
-                final int brotherMax = right ? brother.getMin() : brother.getMax();
+                int brotherMax = right ? brother.getMin() : brother.getMax();
                 brother.delete(brotherMax);
                 //兄弟节点最大key上移
+                parent.delete(parentMax);
                 parent.setData(brotherMax);
+                //如果这次删除的数据包含在索引节点和叶子节点中
+                if (parentMax == brotherMax) {
+                    parent.delete(brotherMax);
+                    brotherMax = right ? brother.getMin() : brother.getMax();
+                    parent.setData(brotherMax);
+                }
             } else {
                 //兄弟节点也是贫穷节点
                 //先问parent一个节点 然后合并贫穷节点，修改指向，parent节点成为新的节点N
@@ -207,7 +200,9 @@ public class BTree {
                 for (int i : node.key) {
                     newNode.setData(i);
                 }
-                newNode.setData(parentMax);
+                if (parentMax != data) {
+                    newNode.setData(parentMax);
+                }
                 //节点合并完成了，修改指向
                 final Node[] children = parent.children;
 
@@ -234,12 +229,6 @@ public class BTree {
                 for (Node child : newNode.children) {
                     child.parent = newNode;
                 }
-
-                if (parent.parent == null) {
-                    root = newNode;
-                    root.trim();
-                    return;
-                }
                 parent.children[parentChildIndex - 1] = newNode;
                 //新的孩子节点
                 Node[] newChildren = new Node[parentChildIndex];
@@ -248,43 +237,20 @@ public class BTree {
                     System.arraycopy(parent.children, parentChildIndex + 1, newChildren, parentChildIndex, children.length - parentChildIndex - 1);
                 }
                 parent.children = newChildren;
+                if (parent.children[0].isLeaf()) {
+                    for (int j = 0; j < parent.children.length - 1; j++) {
+                        parent.children[j].next = parent.children[j + 1];
+                    }
+                }
+                for (Node child : parent.children) {
+                    child.parent = parent;
+                }
+
                 parent.trim();
                 //向parent借了节点，现在要处理parent的情况，如果parent也有这种情况则需要额外进行处理
                 replace(parent, parentMax);
             }
         }
-    }
-
-    /**
-     * 处理内部节点(非叶子节点)
-     *
-     * @param node 节点
-     * @param data 数据
-     */
-    private void handleInternalNode(Node node, int data) {
-        int temp = -1;
-        for (int i = 0; i < node.key.length; i++) {
-            if (node.key[i] == data) {
-                temp = i;
-                break;
-            }
-        }
-        node.delete(data);
-        final Node maxNode = doFindLeafNode(node, temp);
-        final int max = maxNode.getMax();
-        node.setData(max);
-        handleExternalNode(maxNode, max);
-    }
-
-    private Node doFindLeafNode(Node node, int index) {
-        Node child = node.children[index];
-        if (child.isLeaf()) {
-            return child;
-        }
-        while (!child.isLeaf()) {
-            child = child.children[child.numberOfNodes];
-        }
-        return child;
     }
 
     /**
@@ -326,6 +292,45 @@ public class BTree {
         return node.numberOfNodes > Math.ceil(m / 2.0) - 1;
     }
 
+    //这里的递归也可以用 while(next != null){ next = next.child();}的形式来解决
+    private Node findDeleteNode(Node node, int data) {
+        if (node == null) return null;
+        //如果root是叶子节点
+
+        final int max = node.getMax();
+
+        final int min = node.getMin();
+        if (data >= min && data <= max && node.isLeaf()) {
+            return node;
+        }
+        //继续寻找叶子节点
+        //从root节点中寻找下继节点
+        final Node nextChild = nextChild(node, data);
+        if (nextChild == null) {
+            return null;
+        }
+        return findDeleteNode(nextChild, data);
+    }
+
+
+    public void insert(int data) {
+        //如果root节点为空
+        if (root == null) {
+            root = new Node();
+            root.setData(data);
+            return;
+        }
+        //找到数据节点
+        final Node node = findNode(root, data);
+        assert node != null;
+        final int count = node.setData(data);
+        if (count <= m - 1) {
+            return;
+        }
+        //节点分裂
+        split(node, node == root);
+    }
+
     private void split(Node node, boolean isRoot) {
         //1、选出中间节点 ， 这里分为偶数和奇数，奇数取中间值. 偶数取中间值-1
         int childIndex = (int) (m % 2 == 0 ? (Math.ceil(m >> 1) - 1) : Math.ceil(m >> 1));
@@ -345,8 +350,8 @@ public class BTree {
             leftChild.parent = root;
             //右节点
             Node rightChild = new Node();
-            rightChild.key = new int[key.length - childIndex - 1];
-            System.arraycopy(node.key, childIndex + 1, rightChild.key, 0, key.length - childIndex - 1);
+            rightChild.key = new int[key.length - childIndex];
+            System.arraycopy(node.key, childIndex, rightChild.key, 0, key.length - childIndex);
             rightChild.trim();
             rightChild.parent = root;
 
@@ -371,6 +376,14 @@ public class BTree {
                     child.parent = rightChild;
                 }
             }
+            //左孩子指向右孩子
+            if (root.isLeaf()) {
+                leftChild.next = rightChild;
+            } else {
+                if (!rightChild.isLeaf()) {
+                    rightChild.delete(root.key[0]);
+                }
+            }
         } else {
             //             2000(A)
             //            /     \
@@ -380,7 +393,7 @@ public class BTree {
             final Node parent = node.parent;
             //            1000,2000(A)
             //            /     \
-            // [750 1000 500]B  [3000]C
+            // [750 500]B  [3000]C
             parent.setData(indexValue);
 
             //当切节点分裂成2个节点
@@ -391,12 +404,12 @@ public class BTree {
             leftChild.parent = parent;
             //右节点
             Node rightChild = new Node();
-            rightChild.key = new int[key.length - childIndex - 1];
-            System.arraycopy(node.key, childIndex + 1, rightChild.key, 0, key.length - childIndex - 1);
+            rightChild.key = new int[key.length - childIndex];
+            System.arraycopy(node.key, childIndex, rightChild.key, 0, key.length - childIndex);
             rightChild.trim();
             rightChild.parent = parent;
 
-            var children = parent.children;
+            Node[] children = parent.children;
             int parentChildIndex = -1;
             for (int i = 0; i < children.length; i++) {
                 if (children[i] == node) {
@@ -413,6 +426,16 @@ public class BTree {
             parent.children[parentChildIndex + 1] = rightChild;
             parent.trim();
 
+            if (parent.children[0].isLeaf()) {
+                for (int i = 0; i < tempChildren.length - 1; i++) {
+                    tempChildren[i].next = tempChildren[i + 1];
+                }
+            } else {
+                for (int i = 0; i < tempChildren.length - 1; i++) {
+                    tempChildren[i].next = null;
+                }
+            }
+
             final Node[] nodeChildren = node.children;
             if (nodeChildren != null) {
                 //进行分裂
@@ -426,6 +449,14 @@ public class BTree {
                 System.arraycopy(nodeChildren, leftChild.numberOfNodes + 1, rightChild.children, 0, nodeChildren.length - leftChild.numberOfNodes - 1);
                 for (Node child : rightChild.children) {
                     child.parent = rightChild;
+                }
+            }
+            //左孩子指向右孩子
+            if (root.isLeaf()) {
+                leftChild.next = rightChild;
+            } else {
+                if (!rightChild.isLeaf()) {
+                    rightChild.delete(root.key[0]);
                 }
             }
             if (parent.key.length >= m) {
@@ -449,26 +480,6 @@ public class BTree {
             return null;
         }
         return findNode(nextChild, data);
-    }
-
-    //这里的递归也可以用 while(next != null){ next = next.child();}的形式来解决
-    private Node findDeleteNode(Node node, int data) {
-        if (node == null) return null;
-        //如果root是叶子节点
-
-        final int max = node.getMax();
-
-        final int min = node.getMin();
-        if (data >= min && data <= max) {
-            return node;
-        }
-        //继续寻找叶子节点
-        //从root节点中寻找下继节点
-        final Node nextChild = nextChild(node, data);
-        if (nextChild == null) {
-            return null;
-        }
-        return findDeleteNode(nextChild, data);
     }
 
     /**
@@ -496,6 +507,16 @@ public class BTree {
             }
         }
         return null;
+    }
+
+
+    //数据和孩子
+    // m/2<=数据<=m-1
+    // m/2<=孩子<=m-1
+    private final int m;
+
+    public BPlusTree(int m) {
+        this.m = m;
     }
 
     public void traverse() {
@@ -541,11 +562,14 @@ public class BTree {
         final int[] key = node.key;
         final int level = maxLevel(node);
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("     ".repeat(Math.max(0, level))).append("[");
+        stringBuilder.append("  ".repeat(Math.max(0, level))).append("[");
         for (int j : key) {
             stringBuilder.append(j).append(",");
         }
         stringBuilder.delete(stringBuilder.length() - 1, stringBuilder.length()).append("]");
+        if (node.isLeaf() && node.next != null) {
+            stringBuilder.append("-".repeat(Math.max(0, level))).append(">");
+        }
         System.out.print(stringBuilder.toString());
     }
 
@@ -556,8 +580,9 @@ public class BTree {
         return maxLevel(temp) + (temp == null ? 1 : temp.numberOfNodes);
     }
 
+
     private final class Node {
-        public int numberOfNodes;
+        public int numberOfNodes = 0;
         /**
          * the array that holds the keys value.
          */
@@ -572,15 +597,12 @@ public class BTree {
          */
         public Node children[];
 
-        /**
-         * The constructor of the node class
-         * The node can have at most 3 keys. We have 4 references for each node, and assign the node to be isLeaf.
-         */
-        Node() {
-            numberOfNodes = 0;
-        }
+        public Node next;
 
         public int setData(int data) {
+            if (key != null && Arrays.stream(key).anyMatch(value -> data == value)) {
+                return numberOfNodes;
+            }
             int[] newKey = new int[numberOfNodes + 1];
             if (key != null) {
                 System.arraycopy(key, 0, newKey, 0, key.length);
@@ -639,4 +661,5 @@ public class BTree {
             trim();
         }
     }
+
 }
