@@ -11,8 +11,34 @@ import java.util.concurrent.LinkedBlockingQueue;
  */
 public class BPlusTree {
 
-    private Node root;
+    public static void main(String[] args) {
+        BPlusTree bPlusTree = new BPlusTree(5);
+        bPlusTree.insert(1000);
+        bPlusTree.insert(1100);
+        bPlusTree.insert(1200);
+        bPlusTree.insert(1300);
+        bPlusTree.insert(1400);
+        bPlusTree.insert(1500);
+        bPlusTree.insert(1600);
+        bPlusTree.insert(1700);
+        bPlusTree.insert(1800);
+        bPlusTree.insert(1900);
+        bPlusTree.insert(2000);
+        bPlusTree.insert(2100);
+        bPlusTree.insert(2200);
+        bPlusTree.insert(2300);
+        bPlusTree.insert(2400);
+        bPlusTree.insert(2500);
+        bPlusTree.insert(2600);
+        bPlusTree.insert(2700);
+        bPlusTree.insert(2800);
+        bPlusTree.insert(2900);
+        bPlusTree.insert(3000);
+        bPlusTree.insert(3100);
+        bPlusTree.traverse();
+    }
 
+    private Node root;
 
     public void insert(int data) {
         //如果root节点为空
@@ -51,8 +77,8 @@ public class BPlusTree {
             leftChild.parent = root;
             //右节点
             Node rightChild = new Node();
-            rightChild.key = new int[key.length - childIndex - 1];
-            System.arraycopy(node.key, childIndex + 1, rightChild.key, 0, key.length - childIndex - 1);
+            rightChild.key = new int[key.length - childIndex];
+            System.arraycopy(node.key, childIndex, rightChild.key, 0, key.length - childIndex);
             rightChild.trim();
             rightChild.parent = root;
 
@@ -77,6 +103,14 @@ public class BPlusTree {
                     child.parent = rightChild;
                 }
             }
+            //左孩子指向右孩子
+            if (root.isLeaf()) {
+                leftChild.next = rightChild;
+            } else {
+                if (!rightChild.isLeaf()) {
+                    rightChild.delete(root.key[0]);
+                }
+            }
         } else {
             //             2000(A)
             //            /     \
@@ -86,7 +120,7 @@ public class BPlusTree {
             final Node parent = node.parent;
             //            1000,2000(A)
             //            /     \
-            // [750 1000 500]B  [3000]C
+            // [750 500]B  [3000]C
             parent.setData(indexValue);
 
             //当切节点分裂成2个节点
@@ -97,12 +131,12 @@ public class BPlusTree {
             leftChild.parent = parent;
             //右节点
             Node rightChild = new Node();
-            rightChild.key = new int[key.length - childIndex - 1];
-            System.arraycopy(node.key, childIndex + 1, rightChild.key, 0, key.length - childIndex - 1);
+            rightChild.key = new int[key.length - childIndex];
+            System.arraycopy(node.key, childIndex, rightChild.key, 0, key.length - childIndex);
             rightChild.trim();
             rightChild.parent = parent;
 
-            var children = parent.children;
+            Node[] children = parent.children;
             int parentChildIndex = -1;
             for (int i = 0; i < children.length; i++) {
                 if (children[i] == node) {
@@ -119,6 +153,10 @@ public class BPlusTree {
             parent.children[parentChildIndex + 1] = rightChild;
             parent.trim();
 
+            for (int i = 0; i < tempChildren.length - 1; i++) {
+                tempChildren[i].next = tempChildren[i + 1];
+            }
+
             final Node[] nodeChildren = node.children;
             if (nodeChildren != null) {
                 //进行分裂
@@ -132,6 +170,14 @@ public class BPlusTree {
                 System.arraycopy(nodeChildren, leftChild.numberOfNodes + 1, rightChild.children, 0, nodeChildren.length - leftChild.numberOfNodes - 1);
                 for (Node child : rightChild.children) {
                     child.parent = rightChild;
+                }
+            }
+            //左孩子指向右孩子
+            if (root.isLeaf()) {
+                leftChild.next = rightChild;
+            } else {
+                if (!rightChild.isLeaf()) {
+                    rightChild.delete(root.key[0]);
                 }
             }
             if (parent.key.length >= m) {
@@ -237,14 +283,14 @@ public class BPlusTree {
         final int[] key = node.key;
         final int level = maxLevel(node);
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("     ".repeat(Math.max(0, level))).append("[");
+        stringBuilder.append("       ".repeat(Math.max(0, level))).append("[");
         for (int j : key) {
             stringBuilder.append(j).append(",");
         }
-        if (node.isLeaf() && node.next != null) {
-            stringBuilder.append("---->");
-        }
         stringBuilder.delete(stringBuilder.length() - 1, stringBuilder.length()).append("]");
+        if (node.isLeaf() && node.next != null) {
+            stringBuilder.append("-".repeat(Math.max(0, level))).append(">");
+        }
         System.out.print(stringBuilder.toString());
     }
 
@@ -327,6 +373,15 @@ public class BPlusTree {
             if (key.length == 1) {
                 return;
             }
+            Arrays.sort(key);
+            System.arraycopy(key, 1, newKey, 0, numberOfNodes - 1);
+            key = newKey;
+            trim();
+        }
+
+        public void deleteIndexData(int index) {
+            int[] newKey = new int[numberOfNodes - 1];
+            key[index] = -996;
             Arrays.sort(key);
             System.arraycopy(key, 1, newKey, 0, numberOfNodes - 1);
             key = newKey;
