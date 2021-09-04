@@ -94,13 +94,7 @@ public class BTree {
         if (node == null) {
             return false;
         }
-        boolean exist = false;
-        for (int i : node.key) {
-            if (i == data) {
-                exist = true;
-                break;
-            }
-        }
+        boolean exist = Arrays.stream(node.key).anyMatch(x -> x == data);
         if (!exist) {
             System.out.println("node不存在");
             return false;

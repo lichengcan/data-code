@@ -1,5 +1,7 @@
 package io.github.chenshun00.data.tree;
 
+import io.github.chenshun00.data.Tuple;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -36,9 +38,280 @@ public class BPlusTree {
         bPlusTree.insert(3000);
         bPlusTree.insert(3100);
         bPlusTree.traverse();
+
+        bPlusTree.delete(2700);
+        bPlusTree.delete(3100);
+        bPlusTree.delete(3000);
+        bPlusTree.delete(2500);
+        bPlusTree.delete(2800);
+        bPlusTree.delete(2900);
+        bPlusTree.delete(2600);
+        bPlusTree.delete(2400);
+        bPlusTree.delete(2300);
+        bPlusTree.delete(2200);
+        bPlusTree.delete(2100);
+        bPlusTree.delete(2000);
+        bPlusTree.delete(1900);
+        bPlusTree.traverse();
     }
 
     private Node root;
+
+    public boolean delete(int data) {
+        //找节点
+        final Node node = findDeleteNode(root, data);
+        if (node == null) {
+            return false;
+        }
+        boolean exist = Arrays.stream(node.key).anyMatch(x -> x == data);
+        if (!exist) {
+            System.out.println("node不存在");
+            return false;
+        }
+        handleExternalNode(node, data);
+        return true;
+    }
+
+    /**
+     * 处理外部节点(叶子节点)
+     *
+     * @param node 节点
+     * @param data 数据
+     */
+    private void handleExternalNode(Node node, int data) {
+        //自己是富裕节点
+        if (isWealthyNode(node)) {
+            node.delete(data);
+        } else {
+            //自己是贫穷节点
+            node.delete(data);
+            final Node parent = node.parent;
+            //找到兄弟节点
+            final Tuple<Node, Boolean> tuple = findBrother(node);
+            Node brother = tuple.first;
+            final Boolean right = tuple.second;
+            assert brother != null;
+            final int parentMax = parent.getMax();
+            //兄弟节点是富裕节点
+            if (isWealthyNode(brother)) {
+                //parent 最大key下移
+                node.setData(parentMax);
+                int brotherMax = right ? brother.getMin() : brother.getMax();
+                brother.delete(brotherMax);
+                //兄弟节点最大key上移
+                parent.delete(parentMax);
+                parent.setData(brotherMax);
+                //如果这次删除的数据包含在索引节点和叶子节点中
+                if (parentMax == brotherMax) {
+                    parent.delete(brotherMax);
+                    brotherMax = right ? brother.getMin() : brother.getMax();
+                    parent.setData(brotherMax);
+                }
+            } else {
+                //兄弟节点也是贫穷节点
+                //先问parent一个节点 然后合并贫穷节点，修改指向，parent节点成为新的节点N
+                Node newNode = new Node();
+                final int[] key = brother.key;
+                for (int i : key) {
+                    newNode.setData(i);
+                }
+                for (int i : node.key) {
+                    newNode.setData(i);
+                }
+                if (parentMax != data) {
+                    newNode.setData(parentMax);
+                }
+
+                //节点合并完成了，修改指向
+                final Node[] children = parent.children;
+
+                int parentChildIndex = -1;
+                for (int i = 0; i < children.length; i++) {
+                    if (children[i] == node) {
+                        parentChildIndex = i;
+                        break;
+                    }
+                }
+                parent.children[parentChildIndex - 1] = newNode;
+                newNode.parent = parent;
+
+                Node[] newChildren = new Node[parentChildIndex];
+                System.arraycopy(parent.children, 0, newChildren, 0, parentChildIndex);
+                if (parentChildIndex < children.length - 1) {
+                    System.arraycopy(parent.children, parentChildIndex + 1, newChildren, parentChildIndex, children.length - parentChildIndex - 1);
+                }
+                parent.children = newChildren;
+                if (parent.children[0].isLeaf()) {
+                    for (int i = 0; i < parent.children.length - 1; i++) {
+                        parent.children[i].next = parent.children[i + 1];
+                    }
+                }
+                parent.trim();
+                //向parent借了节点，现在要处理parent的情况，如果parent也有这种情况则需要额外进行处理
+                replace(parent, parentMax);
+            }
+        }
+    }
+
+    private void replace(Node node, int data) {
+        //自己是富裕节点
+        if (isWealthyNode(node)) {
+            node.delete(data);
+        } else {
+            node.delete(data);
+            if (node == root) {
+                if (node.children.length == 1) {
+                    root = root.children[0];
+                    root.parent = null;
+                    root.trim();
+                }
+                return;
+            }
+            final Node parent = node.parent;
+            //找到兄弟节点
+            final Tuple<Node, Boolean> tuple = findBrother(node);
+            Node brother = tuple.first;
+            final Boolean right = tuple.second;
+            assert brother != null;
+            final int parentMax = parent.getMax();
+            //兄弟节点是富裕节点
+            if (isWealthyNode(brother)) {
+                //parent 最大key下移
+                node.setData(parentMax);
+                int brotherMax = right ? brother.getMin() : brother.getMax();
+                brother.delete(brotherMax);
+                //兄弟节点最大key上移
+                parent.delete(parentMax);
+                parent.setData(brotherMax);
+                //如果这次删除的数据包含在索引节点和叶子节点中
+                if (parentMax == brotherMax) {
+                    parent.delete(brotherMax);
+                    brotherMax = right ? brother.getMin() : brother.getMax();
+                    parent.setData(brotherMax);
+                }
+            } else {
+                //兄弟节点也是贫穷节点
+                //先问parent一个节点 然后合并贫穷节点，修改指向，parent节点成为新的节点N
+                Node newNode = new Node();
+                final int[] key = brother.key;
+                for (int i : key) {
+                    newNode.setData(i);
+                }
+                for (int i : node.key) {
+                    newNode.setData(i);
+                }
+                if (parentMax != data) {
+                    newNode.setData(parentMax);
+                }
+                //节点合并完成了，修改指向
+                final Node[] children = parent.children;
+
+                int parentChildIndex = -1;
+                for (int i = 0; i < children.length; i++) {
+                    if (children[i] == node) {
+                        parentChildIndex = i;
+                        break;
+                    }
+                }
+
+                final Node[] brotherChildren = brother.children;
+
+                //把孩子节点的指向导向到新节点
+                int i = 0;
+                for (; i < brotherChildren.length; i++) {
+                    newNode.setChild(i, brotherChildren[i]);
+                }
+                final Node[] nodeChildren = node.children;
+                for (int i1 = 0; i1 < nodeChildren.length; i1++) {
+                    newNode.setChild(i + i1, nodeChildren[i1]);
+                }
+
+                for (Node child : newNode.children) {
+                    child.parent = newNode;
+                }
+                parent.children[parentChildIndex - 1] = newNode;
+                //新的孩子节点
+                Node[] newChildren = new Node[parentChildIndex];
+                System.arraycopy(parent.children, 0, newChildren, 0, parentChildIndex);
+                if (parentChildIndex < children.length - 1) {
+                    System.arraycopy(parent.children, parentChildIndex + 1, newChildren, parentChildIndex, children.length - parentChildIndex - 1);
+                }
+                parent.children = newChildren;
+                if (parent.children[0].isLeaf()) {
+                    for (int j = 0; j < parent.children.length - 1; j++) {
+                        parent.children[j].next = parent.children[j + 1];
+                    }
+                }
+                for (Node child : parent.children) {
+                    child.parent = parent;
+                }
+
+                parent.trim();
+                //向parent借了节点，现在要处理parent的情况，如果parent也有这种情况则需要额外进行处理
+                replace(parent, parentMax);
+            }
+        }
+    }
+
+    /**
+     * 找兄弟节点
+     *
+     * @param node 节点
+     * @return 兄弟节点信息，兄弟是左还是右
+     */
+    private Tuple<Node, Boolean> findBrother(Node node) {
+        final Node parent = node.parent;
+        int index = -1;
+        for (int i = 0; i < parent.children.length; i++) {
+            if (parent.children[i] == node) {
+                index = i;
+                break;
+            }
+        }
+        //取右兄弟
+        if (index == 0) {
+            return new Tuple<>(parent.children[index + 1], true);
+        } else {
+            final Node leftBro = parent.children[index - 1];
+            if (index + 1 >= parent.children.length) {
+                return new Tuple<>(leftBro, false);
+            }
+            final Node rightBro = parent.children[index + 1];
+            if (isWealthyNode(leftBro)) {
+                return new Tuple<>(leftBro, false);
+            }
+            if (isWealthyNode(rightBro)) {
+                return new Tuple<>(rightBro, true);
+            }
+            return new Tuple<>(leftBro, false);
+        }
+    }
+
+
+    private boolean isWealthyNode(Node node) {
+        return node.numberOfNodes > Math.ceil(m / 2.0) - 1;
+    }
+
+    //这里的递归也可以用 while(next != null){ next = next.child();}的形式来解决
+    private Node findDeleteNode(Node node, int data) {
+        if (node == null) return null;
+        //如果root是叶子节点
+
+        final int max = node.getMax();
+
+        final int min = node.getMin();
+        if (data >= min && data <= max && node.isLeaf()) {
+            return node;
+        }
+        //继续寻找叶子节点
+        //从root节点中寻找下继节点
+        final Node nextChild = nextChild(node, data);
+        if (nextChild == null) {
+            return null;
+        }
+        return findDeleteNode(nextChild, data);
+    }
+
 
     public void insert(int data) {
         //如果root节点为空
@@ -153,8 +426,14 @@ public class BPlusTree {
             parent.children[parentChildIndex + 1] = rightChild;
             parent.trim();
 
-            for (int i = 0; i < tempChildren.length - 1; i++) {
-                tempChildren[i].next = tempChildren[i + 1];
+            if (parent.children[0].isLeaf()) {
+                for (int i = 0; i < tempChildren.length - 1; i++) {
+                    tempChildren[i].next = tempChildren[i + 1];
+                }
+            } else {
+                for (int i = 0; i < tempChildren.length - 1; i++) {
+                    tempChildren[i].next = null;
+                }
             }
 
             final Node[] nodeChildren = node.children;
@@ -283,7 +562,7 @@ public class BPlusTree {
         final int[] key = node.key;
         final int level = maxLevel(node);
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("       ".repeat(Math.max(0, level))).append("[");
+        stringBuilder.append("  ".repeat(Math.max(0, level))).append("[");
         for (int j : key) {
             stringBuilder.append(j).append(",");
         }
@@ -321,6 +600,9 @@ public class BPlusTree {
         public Node next;
 
         public int setData(int data) {
+            if (key != null && Arrays.stream(key).anyMatch(value -> data == value)) {
+                return numberOfNodes;
+            }
             int[] newKey = new int[numberOfNodes + 1];
             if (key != null) {
                 System.arraycopy(key, 0, newKey, 0, key.length);
@@ -373,15 +655,6 @@ public class BPlusTree {
             if (key.length == 1) {
                 return;
             }
-            Arrays.sort(key);
-            System.arraycopy(key, 1, newKey, 0, numberOfNodes - 1);
-            key = newKey;
-            trim();
-        }
-
-        public void deleteIndexData(int index) {
-            int[] newKey = new int[numberOfNodes - 1];
-            key[index] = -996;
             Arrays.sort(key);
             System.arraycopy(key, 1, newKey, 0, numberOfNodes - 1);
             key = newKey;
