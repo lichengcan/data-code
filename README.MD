@@ -1,4 +1,6 @@
-### 部分数据结构的Java实现
+## 部分数据结构的Java实现
+
+### 树🌲
 
 * 二叉树 io.github.chenshun00.data.tree.BinaryTree
     * [二叉树的双节点实现](https://www.yuque.com/chenshun00/sbny2o/xb92cq)
@@ -11,6 +13,10 @@
     * [B树的实现](https://www.yuque.com/chenshun00/sbny2o/ty9iys)
 * B+树 io.github.chenshun00.data.tree.BPlusTree
     * [B+树的实现](https://www.yuque.com/chenshun00/sbny2o/md7guz)
+
+### 哈希表
+* 固定容量的hash实现 io.github.chenshun00.data.hash.SimpleHashImpl
+* resize的hash实现 io.github.chenshun00.data.hash.ReHashImpl
 
 ### 启动要求
 
