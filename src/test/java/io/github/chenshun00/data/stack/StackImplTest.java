@@ -1,6 +1,7 @@
 package io.github.chenshun00.data.stack;
 
-import static org.junit.Assert.*;
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * @author luobo.cs@raycloud.com
@@ -8,4 +9,17 @@ import static org.junit.Assert.*;
  */
 public class StackImplTest {
 
+    @Test
+    public void testStackImpl() {
+        StackImpl<String> testStack = new StackImpl<>();
+        for (int i = 0; i < 16; i++) {
+            testStack.push(i + "zz");
+        }
+        Assert.assertEquals(16, testStack.size());
+        Assert.assertEquals("15zz", testStack.pop());
+        Assert.assertEquals("14zz", testStack.pop());
+        Assert.assertEquals("13zz", testStack.pop());
+        Assert.assertEquals("12zz", testStack.pop());
+        Assert.assertEquals(12, testStack.size());
+    }
 }

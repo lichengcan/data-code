@@ -1,6 +1,7 @@
 package io.github.chenshun00.data.queue;
 
-import static org.junit.Assert.*;
+import org.junit.Assert;
+import org.junit.Test;
 
 /**
  * @author luobo.cs@raycloud.com
@@ -8,4 +9,19 @@ import static org.junit.Assert.*;
  */
 public class LinkedListQueueTest {
 
+    @Test
+    public void testLinkedListQueue() {
+        LinkedListQueue<String> queue = new LinkedListQueue<>();
+        queue.push("111");
+        queue.push("222");
+        queue.push("333");
+        queue.push("444");
+        Assert.assertEquals(4, queue.size());
+        Assert.assertEquals("111", queue.poll());
+        Assert.assertEquals("222", queue.poll());
+        Assert.assertEquals("333", queue.poll());
+        Assert.assertEquals("444", queue.poll());
+        Assert.assertNull(queue.poll());
+        Assert.assertEquals(0, queue.size());
+    }
 }
