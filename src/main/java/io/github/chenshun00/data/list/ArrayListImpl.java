@@ -56,6 +56,7 @@ public class ArrayListImpl<T> {
             return false;
         }
         System.arraycopy(elements, tempIndex + 1, elements, tempIndex, length - tempIndex);
+        location--;
         return true;
     }
 
