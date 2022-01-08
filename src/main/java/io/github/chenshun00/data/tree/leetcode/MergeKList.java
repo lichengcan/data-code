@@ -1,5 +1,6 @@
 package io.github.chenshun00.data.tree.leetcode;
 
+import java.util.Comparator;
 import java.util.PriorityQueue;
 
 /**
@@ -29,7 +30,7 @@ public class MergeKList {
     }
 
     public ListNode mergeKLists(ListNode[] lists) {
-        PriorityQueue<Integer> priorityQueue = new PriorityQueue<>(100, (o1, o2) -> o1 - o2);
+        PriorityQueue<Integer> priorityQueue = new PriorityQueue<>(100, Comparator.comparingInt(o -> o));
         for (ListNode list : lists) {
             while (list != null) {
                 priorityQueue.add(list.val);
