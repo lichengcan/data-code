@@ -1,10 +1,12 @@
 package io.github.chenshun00.data.tree.leetcode;
 
+import java.util.PriorityQueue;
+
 /**
  * @author chenshun00@gmail.com
- * @since 2022/1/8 3:45 下午
+ * @since 2022/1/8 4:50 下午
  */
-public class Merge2List {
+public class MergeKList {
 
     public static void main(String[] args) {
         ListNode first = new ListNode(1);
@@ -21,59 +23,42 @@ public class Merge2List {
             listNode.next = listNode2;
             listNode2.next = new ListNode(10086);
         }
-        Merge2List merge2List = new Merge2List();
-        final ListNode listNode = merge2List.mergeTwoLists(first, second);
+        MergeKList mergeKList = new MergeKList();
+        final ListNode listNode = mergeKList.mergeKLists(new ListNode[]{first, second});
         listNode.traverse();
     }
 
-    public ListNode mergeTwoLists(ListNode first, ListNode second) {
-        if (first == null && second == null) {
-            return null;
-        }
-        if (first == null) {
-            return second;
-        }
-        if (second == null) {
-            return first;
-        }
-        ListNode listNode = new ListNode(-1);
-        ListNode p = listNode;
-        do {
-            //比较小值 获取对象
-            int firstVal = first.val;
-            int secondVal = second.val;
-
-            boolean _f = firstVal <= secondVal;
-            if (_f) {
-                p.next = first;
-                first = first.next;
-            } else {
-                p.next = second;
-                second = second.next;
+    public ListNode mergeKLists(ListNode[] lists) {
+        PriorityQueue<Integer> priorityQueue = new PriorityQueue<>(100, (o1, o2) -> o1 - o2);
+        for (ListNode list : lists) {
+            while (list != null) {
+                priorityQueue.add(list.val);
+                list = list.next;
             }
-            p = p.next;
-        } while (first != null && second != null);
-        if (first != null) {
-            p.next = first;
         }
-        if (second != null) {
-            p.next = second;
+        ListNode listNode = new ListNode();
+        ListNode p = listNode;
+        while (!priorityQueue.isEmpty()) {
+            final Integer poll = priorityQueue.poll();
+            p.next = new ListNode(poll, null);
+            p = p.next;
         }
         return listNode.next;
     }
 
+
     public static class ListNode {
-        public int val;
+        int val;
         ListNode next;
 
-        public ListNode() {
+        ListNode() {
         }
 
-        public ListNode(int val) {
+        ListNode(int val) {
             this.val = val;
         }
 
-        public ListNode(int val, ListNode next) {
+        ListNode(int val, ListNode next) {
             this.val = val;
             this.next = next;
         }
@@ -90,4 +75,5 @@ public class Merge2List {
             }
         }
     }
+
 }

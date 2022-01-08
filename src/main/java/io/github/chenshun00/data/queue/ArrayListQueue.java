@@ -3,7 +3,7 @@ package io.github.chenshun00.data.queue;
 /**
  * <a href="https://www.yuque.com/chenshun00/sbny2o/utvmmo">基于数组的队列实现</a>
  *
- * @author luobo.cs@raycloud.com
+ * @author chenshun00@gmail.com
  * @since 2021/7/25 10:47 上午
  */
 public class ArrayListQueue<E> {

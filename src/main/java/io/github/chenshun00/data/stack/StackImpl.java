@@ -1,7 +1,7 @@
 package io.github.chenshun00.data.stack;
 
 /**
- * @author luobo.cs@raycloud.com
+ * @author chenshun00@gmail.com
  * @since 2021/9/6 9:17 上午
  */
 public class StackImpl<E> {

@@ -18,6 +18,17 @@
 * 固定容量的hash实现 io.github.chenshun00.data.hash.SimpleHashImpl
 * resize的hash实现 io.github.chenshun00.data.hash.ReHashImpl
 
+### 链表
+
+* 合并 `2` 个有序列表
+* 合并 `K` 个有序列表
+ * 优先级队列
+* 寻找链表的倒数第 `k` 个节点
+* 寻找链表的中点
+* 判断单链表是否包含环并找出环起点
+* 判断两个单链表是否相交并找出交点
+
 ### 启动要求
+
 
 * JDK 11，存在部分 `var` 变量，很少，如果没有JDK11，可以全局查看替换一下
