@@ -23,7 +23,7 @@ public class BinaryTree {
         binaryTree.insertNode(999);
         binaryTree.traverse();
         System.out.println("删除节点:===>" + binaryTree.deleteNode(3));
-        binaryTree.traverse();
+//        binaryTree.traverse();
         System.out.println("删除节点:===>" + binaryTree.deleteNode(2));
         binaryTree.traverse();
     }

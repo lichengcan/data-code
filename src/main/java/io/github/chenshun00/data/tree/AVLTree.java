@@ -20,10 +20,10 @@ public class AVLTree {
         avlTree.insert(5);
         avlTree.insert(6);
         avlTree.insert(7);
-//        avlTree.insert(8);
-//        avlTree.insert(9);
-//        avlTree.insert(999);
-//        avlTree.traverse();
+        avlTree.insert(8);
+        avlTree.insert(9);
+        avlTree.insert(999);
+        avlTree.traverse();
 //        System.out.println(avlTree.isAVLTree());
 //        final Node node = avlTree.findNode(9);
 //        System.out.println(node);
@@ -98,6 +98,7 @@ public class AVLTree {
     }
 
     public void traverse() {
+        System.out.println("红色说明树的高度");
         TreePrinter.printNode(root);
         System.out.println("==================================================");
     }
