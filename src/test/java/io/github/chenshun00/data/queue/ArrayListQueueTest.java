@@ -30,4 +30,19 @@ public class ArrayListQueueTest {
         Assert.assertEquals("66", queue.poll());
         Assert.assertEquals(0, queue.size());
     }
+
+    @Test
+    public void testWait() throws InterruptedException {
+        ArrayListQueue<String> queue = new ArrayListQueue<>(3);
+        new Thread(() -> {
+            try {
+                Thread.sleep(5000L);
+                queue.push("cc");
+            } catch (Exception ignore) {
+            }
+        }).start();
+        final String take = queue.take();
+        Assert.assertNotNull(take);
+        Assert.assertEquals("cc", take);
+    }
 }

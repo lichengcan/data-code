@@ -8,6 +8,9 @@ package io.github.chenshun00.data.queue;
  */
 public class ArrayListQueue<E> {
 
+    public volatile boolean lock = false;
+
+    public final Object LOCK = new Object();
 
     private final Object[] elements;
 
@@ -47,6 +50,12 @@ public class ArrayListQueue<E> {
         if (size >= initialCapacity) {
             size = initialCapacity;
         }
+        if (lock) {
+            synchronized (this) {
+                lock = false;
+                this.notify();
+            }
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -65,5 +74,17 @@ public class ArrayListQueue<E> {
             size = 0;
         }
         return (E) element;
+    }
+
+
+    public E take() throws InterruptedException {
+        final E poll = poll();
+        if (poll == null) {
+            synchronized (this) {
+                lock = true;
+                this.wait();
+            }
+        }
+        return poll();
     }
 }
