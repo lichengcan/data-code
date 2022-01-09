@@ -1,30 +1,34 @@
 package io.github.chenshun00.data.tree;
 
-import io.github.chenshun00.data.Node;
-import io.github.chenshun00.data.print.TreePrinter;
-
 /**
  * @author chenshun00@gmail.com
  * @since 2021/8/13 1:24 下午
  */
 public class BinaryTree {
-
     public static void main(String[] args) {
         BinaryTree binaryTree = new BinaryTree();
+        binaryTree.insertNode(22);
         binaryTree.insertNode(1);
-        binaryTree.insertNode(2);
-        binaryTree.insertNode(3);
         binaryTree.insertNode(4);
-        binaryTree.insertNode(5);
-        binaryTree.insertNode(6);
-        binaryTree.insertNode(7);
-        binaryTree.insertNode(8);
+        binaryTree.insertNode(3);
+        binaryTree.insertNode(10);
         binaryTree.insertNode(9);
-        binaryTree.insertNode(999);
+        binaryTree.insertNode(9);
+        binaryTree.insertNode(8);
+        binaryTree.insertNode(190);
+        binaryTree.insertNode(11);
+        binaryTree.insertNode(12);
+        binaryTree.insertNode(13);
+        binaryTree.insertNode(231);
+        binaryTree.insertNode(22);
         binaryTree.traverse();
-        System.out.println("删除节点:===>" + binaryTree.deleteNode(3));
-//        binaryTree.traverse();
-        System.out.println("删除节点:===>" + binaryTree.deleteNode(2));
+        System.out.println("删除节点:===>" + binaryTree.deleteNode(9));
+        binaryTree.traverse();
+        System.out.println("删除节点:===>" + binaryTree.deleteNode(13));
+        binaryTree.traverse();
+        System.out.println("删除节点:===>" + binaryTree.deleteNode(22));
+        binaryTree.traverse();
+        System.out.println("删除节点:===>" + binaryTree.deleteNode(22));
         binaryTree.traverse();
     }
 
@@ -78,8 +82,7 @@ public class BinaryTree {
     }
 
     public void traverse() {
-        TreePrinter.printNode(root);
-        System.out.println("==================================================");
+        doTraverse(root);
         System.out.println();
     }
 
@@ -167,6 +170,16 @@ public class BinaryTree {
         }
     }
 
+    //==============================遍历==================================
+    private void doTraverse(Node node) {
+        if (node == null) {
+            return;
+        }
+        doTraverse(node.leftChild);
+        System.out.print(node.data + "\t");
+        doTraverse(node.rightChild);
+    }
+
     //=================插入数据=====================
 
     private void handleData(Node root, Integer data) {
@@ -195,6 +208,22 @@ public class BinaryTree {
         } else {
             handleData(left, data);
         }
+    }
+
+
+    public static class Node {
+
+        public Node(Node leftChild, Node rightChild, Node parent, Integer data) {
+            this.leftChild = leftChild;
+            this.rightChild = rightChild;
+            this.parent = parent;
+            this.data = data;
+        }
+
+        public Node leftChild;
+        public Node rightChild;
+        public Node parent;
+        public Integer data;
     }
 
 }
