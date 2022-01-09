@@ -42,6 +42,9 @@ public class Node {
         this.data = data;
     }
 
+    /**
+     * 左子
+     */
     public Node leftChild;
     public Node rightChild;
     public Node parent;

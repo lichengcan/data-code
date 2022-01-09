@@ -1,5 +1,11 @@
 package io.github.chenshun00.data.tree;
 
+import io.github.chenshun00.data.Node;
+import io.github.chenshun00.data.print.TreePrinter;
+
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author chenshun00@gmail.com
  * @since 2021/8/13 1:24 下午
@@ -7,37 +13,27 @@ package io.github.chenshun00.data.tree;
 public class BinaryTree {
     public static void main(String[] args) {
         BinaryTree binaryTree = new BinaryTree();
-        binaryTree.insertNode(1);
-        binaryTree.insertNode(2);
-        binaryTree.insertNode(3);
-        binaryTree.insertNode(4);
-        System.out.println(binaryTree.maxLevel(binaryTree.root));
-//        binaryTree.insertNode(22);
-//        binaryTree.insertNode(1);
-//        binaryTree.insertNode(4);
-//        binaryTree.insertNode(3);
-//        binaryTree.insertNode(10);
-//        binaryTree.insertNode(9);
-//        binaryTree.insertNode(9);
-//        binaryTree.insertNode(8);
-//        binaryTree.insertNode(190);
-//        binaryTree.insertNode(11);
-//        binaryTree.insertNode(12);
-//        binaryTree.insertNode(13);
-//        binaryTree.insertNode(231);
-//        binaryTree.insertNode(22);
-//        binaryTree.traverse();
-//        System.out.println("删除节点:===>" + binaryTree.deleteNode(9));
-//        binaryTree.traverse();
-//        System.out.println("删除节点:===>" + binaryTree.deleteNode(13));
-//        binaryTree.traverse();
-//        System.out.println("删除节点:===>" + binaryTree.deleteNode(22));
-//        binaryTree.traverse();
-//        System.out.println("删除节点:===>" + binaryTree.deleteNode(22));
-//        binaryTree.traverse();
+
+        Integer[] xx = {1, 3, 2};
+        for (Integer integer : xx) {
+            binaryTree.insertNode(integer);
+        }
+        TreePrinter.printNode(binaryTree.root);
+        binaryTree.preorder(binaryTree.root);
     }
 
-    public Node root;
+
+    //前序
+    public List<Integer> preorderTraversal(Node root) {
+        List<Integer> xx = new ArrayList<>();
+        if (root == null) {
+            return xx;
+        }
+        xx.add(root.data);
+        xx.addAll(preorderTraversal(root.leftChild));
+        xx.addAll(preorderTraversal(root.rightChild));
+        return xx;
+    }
 
     //https://leetcode-cn.com/problems/maximum-depth-of-binary-tree/
     //给定一个二叉树，找出其最大深度。
@@ -46,6 +42,50 @@ public class BinaryTree {
         if (node == null) return 0;
         return 1 + Math.max(maxLevel(node.leftChild), maxLevel(node.rightChild));
     }
+
+    int max = 0;
+
+    /**
+     * 二叉树的直径
+     * https://leetcode-cn.com/problems/diameter-of-binary-tree/
+     * <p>
+     * 必须经过跟节点，这个方法就是正确的. 但是如果不是必须经过根节点，这个方法就是错误的. 出现了审题错误
+     * <p>
+     * 给定一棵二叉树，你需要计算它的直径长度。一棵二叉树的直径长度是任意两个结点路径长度中的最大值。这条路径可能穿过也可能不穿过根结点。
+     *
+     * @param root 根
+     * @return int
+     */
+    public void diameterOfBinaryTree(Node root) {
+        //
+    }
+
+    public Node root;
+
+    //前序遍历
+    public void preorder(Node node) {
+        if (node == null) return;
+        System.out.print(node.data + "\t");
+        preorder(node.leftChild);
+        preorder(node.rightChild);
+    }
+
+    //后序遍历
+    public void postorder(Node node) {
+        if (node == null) return;
+        postorder(node.leftChild);
+        postorder(node.rightChild);
+        System.out.print(node.data + "\t");
+    }
+
+    //中序遍历
+    public void inorder(Node node) {
+        if (node == null) return;
+        inorder(node.leftChild);
+        System.out.print(node.data + "\t");
+        inorder(node.rightChild);
+    }
+
 
     public boolean deleteNode(Integer data) {
         if (root == null) {
@@ -224,19 +264,19 @@ public class BinaryTree {
     }
 
 
-    public static class Node {
-
-        public Node(Node leftChild, Node rightChild, Node parent, Integer data) {
-            this.leftChild = leftChild;
-            this.rightChild = rightChild;
-            this.parent = parent;
-            this.data = data;
-        }
-
-        public Node leftChild;
-        public Node rightChild;
-        public Node parent;
-        public Integer data;
-    }
+//    public static class Node {
+//
+//        public Node(Node leftChild, Node rightChild, Node parent, Integer data) {
+//            this.leftChild = leftChild;
+//            this.rightChild = rightChild;
+//            this.parent = parent;
+//            this.data = data;
+//        }
+//
+//        public Node leftChild;
+//        public Node rightChild;
+//        public Node parent;
+//        public Integer data;
+//    }
 
 }
