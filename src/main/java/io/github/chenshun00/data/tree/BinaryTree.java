@@ -7,32 +7,45 @@ package io.github.chenshun00.data.tree;
 public class BinaryTree {
     public static void main(String[] args) {
         BinaryTree binaryTree = new BinaryTree();
-        binaryTree.insertNode(22);
         binaryTree.insertNode(1);
-        binaryTree.insertNode(4);
+        binaryTree.insertNode(2);
         binaryTree.insertNode(3);
-        binaryTree.insertNode(10);
-        binaryTree.insertNode(9);
-        binaryTree.insertNode(9);
-        binaryTree.insertNode(8);
-        binaryTree.insertNode(190);
-        binaryTree.insertNode(11);
-        binaryTree.insertNode(12);
-        binaryTree.insertNode(13);
-        binaryTree.insertNode(231);
-        binaryTree.insertNode(22);
-        binaryTree.traverse();
-        System.out.println("删除节点:===>" + binaryTree.deleteNode(9));
-        binaryTree.traverse();
-        System.out.println("删除节点:===>" + binaryTree.deleteNode(13));
-        binaryTree.traverse();
-        System.out.println("删除节点:===>" + binaryTree.deleteNode(22));
-        binaryTree.traverse();
-        System.out.println("删除节点:===>" + binaryTree.deleteNode(22));
-        binaryTree.traverse();
+        binaryTree.insertNode(4);
+        System.out.println(binaryTree.maxLevel(binaryTree.root));
+//        binaryTree.insertNode(22);
+//        binaryTree.insertNode(1);
+//        binaryTree.insertNode(4);
+//        binaryTree.insertNode(3);
+//        binaryTree.insertNode(10);
+//        binaryTree.insertNode(9);
+//        binaryTree.insertNode(9);
+//        binaryTree.insertNode(8);
+//        binaryTree.insertNode(190);
+//        binaryTree.insertNode(11);
+//        binaryTree.insertNode(12);
+//        binaryTree.insertNode(13);
+//        binaryTree.insertNode(231);
+//        binaryTree.insertNode(22);
+//        binaryTree.traverse();
+//        System.out.println("删除节点:===>" + binaryTree.deleteNode(9));
+//        binaryTree.traverse();
+//        System.out.println("删除节点:===>" + binaryTree.deleteNode(13));
+//        binaryTree.traverse();
+//        System.out.println("删除节点:===>" + binaryTree.deleteNode(22));
+//        binaryTree.traverse();
+//        System.out.println("删除节点:===>" + binaryTree.deleteNode(22));
+//        binaryTree.traverse();
     }
 
     public Node root;
+
+    //https://leetcode-cn.com/problems/maximum-depth-of-binary-tree/
+    //给定一个二叉树，找出其最大深度。
+    //二叉树的深度为根节点到最远叶子节点的最长路径上的节点数。
+    public int maxLevel(Node node) {
+        if (node == null) return 0;
+        return 1 + Math.max(maxLevel(node.leftChild), maxLevel(node.rightChild));
+    }
 
     public boolean deleteNode(Integer data) {
         if (root == null) {
