@@ -43,7 +43,7 @@ public class ReverseList {
      * head=5.head.next=6
      */
     public ListNode recursion(ListNode head) {
-        if (head == null || head.next == null) return head;
+        if (head.next == null) return head;
         //1-->2-->3-->4-->5-->6-->NULL
         //6-->5-->4-->3-->2-->1-->NULL
         //以前是1-->2
