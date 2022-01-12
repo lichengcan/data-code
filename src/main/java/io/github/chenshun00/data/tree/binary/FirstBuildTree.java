@@ -29,40 +29,30 @@ public class FirstBuildTree {
     }
 
     public TreeNode buildTree(int[] preorder, int[] inorder) {
-        return doSet(preorder, inorder, 0, preorder.length - 1, 0, inorder.length - 1);
+        return doBuildTree(preorder, 0, preorder.length - 1, inorder, 0, inorder.length - 1);
     }
 
-    private TreeNode doSet(int[] preorder, int[] inorder, int preStart, int preEnd, int inStart, int inEnd) {
+    private TreeNode doBuildTree(int[] pre, int preStart, int preEnd, int[] in, int inStart, int inEnd) {
         if (preStart > preEnd) {
             return null;
         }
-        final TreeNode tt = new TreeNode();
-        //根节点的数据
-        final int rootNode = preorder[preStart];//rootNode=3
-        //
-        //9, 3, 15, 20, 7 //middle = 1
-        final int middle = middle(inorder, rootNode, inStart, inEnd);
-
-        //剩下没有计算完的数据
+        final int root = pre[preStart];
+        final int middle = middle(in, root, inStart, inEnd);
         int leftSize = middle - inStart;
 
-        //
-        // inStart, middle - 1 这部分肯定是没有歧义的
-        // middle + 1, inEnd 这段肯定也是没有歧义的
-        // preStart + 1 也可以理解的
-        // left的preEnd+right的preStart是一体的，他们相加=参数的preEnd
-        // 这里为什么是leftSize， middle-preStart不可以么，其实这里是要确定下表。而不是数量，如果我走拷贝应该也是可以的。
-        final TreeNode left = doSet(preorder, inorder, preStart + 1, preStart + leftSize, inStart, middle - 1);
-        final TreeNode right = doSet(preorder, inorder, preStart + leftSize + 1, preEnd, middle + 1, inEnd);
+        TreeNode left = doBuildTree(pre, preStart + 1, preStart + leftSize, in, inStart, middle - 1);
+        TreeNode right = doBuildTree(pre, preStart + leftSize + 1, preEnd, in, middle + 1, inEnd);
 
-        tt.val = rootNode;
-        tt.left = left;
-        tt.right = right;
-        return tt;
+        TreeNode treeNode = new TreeNode();
+        treeNode.val = root;
+        treeNode.left = left;
+        treeNode.right = right;
+
+        return treeNode;
     }
 
-    public int middle(int[] inorder, int target, int inStart, int inEnd) {
-        for (int i = inStart; i <= inEnd; i++) {
+    public int middle(int[] inorder, int target, int start, int end) {
+        for (int i = start; i <= end; i++) {
             if (inorder[i] == target) {
                 return i;
             }
