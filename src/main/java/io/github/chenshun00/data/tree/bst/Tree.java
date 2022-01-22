@@ -9,17 +9,20 @@ public class Tree {
     public static void main(String[] args) {
         Tree tree = new Tree();
         TreeNode treeNode = new TreeNode(4);
-        treeNode = tree.insertIntoBST(treeNode, 2);
         treeNode = tree.insertIntoBST(treeNode, 7);
-        treeNode = tree.insertIntoBST(treeNode, 1);
-        treeNode = tree.insertIntoBST(treeNode, 3);
+        treeNode = tree.insertIntoBST(treeNode, 6);
+        treeNode = tree.insertIntoBST(treeNode, 8);
         treeNode = tree.insertIntoBST(treeNode, 5);
+        treeNode = tree.insertIntoBST(treeNode, 9);
         System.out.println(treeNode);
+
+        treeNode = tree.deleteNode(treeNode, 7);
+        System.out.println(1);
     }
 
     public TreeNode deleteNode(TreeNode root, int key) {
         if (root == null) {
-            return root;
+            return null;
         }
         //找到当前节点
         final TreeNode node = doFindNode(root, key);
@@ -31,33 +34,134 @@ public class Tree {
         if (node == root) {
             //如果根节点是叶子节点
             if (isLeaf(root)) {
-                root = null;
+                return null;
             } else {
-                replace(root);
+                replace(root, root);
             }
-            return true;
+            return root;
         }
         //被移除的是不是叶子节点
         if (isLeaf(node)) {
             //找到叶子节点的parent节点，并且说明当前节点是左(left)子树还是右子树(right)
-            final NodeContext nodeContext = findParent(node);
-            final Node parentNode = nodeContext.node;
-            if (nodeContext.left) {
-                parentNode.leftChild = null;
+            final TreeNode parent = findParent(root, key);
+            if (parent.left == node) {
+                parent.left = null;
             } else {
-                parentNode.rightChild = null;
+                parent.right = null;
             }
         } else {
-            replace(node);
+            replace(root, node);
         }
-        return true;
+        return root;
     }
 
-    private TreeNode doFindNode(TreeNode root, Integer data) {
+
+    public void replace(TreeNode root, TreeNode node) {
+        //找到左子树中最大的节点 或者 是右子树中最小的节点
+        final TreeNode next = findNext(node);
+        //找到这个节点的parent节点
+        TreeNode nodeContext = findParent(root, next.val);
+        if (nodeContext == null) {
+            return;
+        }
+        if (nodeContext.left == next) {
+            nodeContext.left = next.left;
+        } else if (nodeContext.right == next) {
+            nodeContext.right = next.right;
+        }
+        node.val = next.val;
+    }
+
+    public TreeNode findNext(TreeNode node) {
+        if (node.left != null) {
+            return doFindMaxNode(node.left);
+        }
+        return doFindMinNode(node.right);
+    }
+
+
+    private TreeNode doFindMaxNode(TreeNode node) {
+        if (node.right == null) {
+            return node;
+        } else {
+            return doFindMaxNode(node.right);
+        }
+    }
+
+
+    private TreeNode doFindMinNode(TreeNode node) {
+        if (node.left == null) {
+            return node;
+        } else {
+            return doFindMinNode(node.left);
+        }
+    }
+
+    public TreeNode findParent(TreeNode root, int data) {
         if (root == null) {
             return null;
         }
-        return data >= root.val ? doFindNode(root.right, data) : doFindNode(root.left, data);
+        TreeNode node = new TreeNode(data);
+        return doFind(root, node);
+    }
+
+
+    private TreeNode doFind(TreeNode root, TreeNode node) {
+        if (root == null) {
+            return null;
+        }
+        return node.val >= root.val ? doFindParentRight(root, node) : doFindParentLeft(root, node);
+    }
+
+    /**
+     * 左
+     */
+    private TreeNode doFindParentLeft(TreeNode root, TreeNode node) {
+        if (root == null) {
+            return null;
+        }
+        if (root.left != null) {
+            if (root.left.val == node.val) {
+                return root;
+            }
+        }
+        if (root.right != null) {
+            if (root.right.val == node.val) {
+                return root;
+            }
+        }
+        return doFind(root.left, node);
+    }
+
+    /**
+     * 右
+     */
+    private TreeNode doFindParentRight(TreeNode root, TreeNode node) {
+        if (root == null) {
+            return null;
+        }
+        if (root.left != null) {
+            if (root.left.val == node.val) {
+                return root;
+            }
+        }
+        if (root.right != null) {
+            if (root.right.val == node.val) {
+                return root;
+            }
+        }
+        return doFind(root.right, node);
+    }
+
+
+    private TreeNode doFindNode(TreeNode root, int key) {
+        if (root == null) {
+            return null;
+        }
+        if (root.val == key) {
+            return root;
+        }
+        return key >= root.val ? doFindNode(root.right, key) : doFindNode(root.left, key);
     }
 
 
