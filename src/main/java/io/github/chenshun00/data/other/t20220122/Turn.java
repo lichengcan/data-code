@@ -33,8 +33,31 @@ public class Turn {
 //        System.out.println(turn.parser(3));
 //        System.out.println(turn.parser(4));
 //        System.out.println(turn.parser(9));
-        System.out.println(turn.parser(58));
+        System.out.println(turn.romanToInt("III"));
+        System.out.println(turn.romanToInt("IV"));
+        System.out.println(turn.romanToInt("IX"));
+        System.out.println(turn.romanToInt("LVIII"));
+        System.out.println(turn.romanToInt("MCMXCIV"));
 //        System.out.println(turn.parser(1994));
+    }
+
+
+    String[] str = {"M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV", "I"};
+    int[] ff = {1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1};
+
+    public int romanToInt(String s) {
+        int i = 0;
+        while (s.length() > 0) {
+            for (int i1 = 0; i1 < str.length; i1++) {
+                final String s1 = str[i1];
+                final int num = ff[i1];
+                if (s.startsWith(s1)) {
+                    i += num;
+                    s = s.substring(s1.length());
+                }
+            }
+        }
+        return i;
     }
 
     /**
