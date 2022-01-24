@@ -6,6 +6,75 @@ package io.github.chenshun00.data.other.t20220122;
  */
 public class AddTwoNumbers {
 
+    /**
+     * https://leetcode-cn.com/problems/container-with-most-water/
+     * <p>
+     * 双for可以处理完，但是超时了.O(n^2)
+     * 这里一个典型的优化，就是将两个for循环优化成一个for循环，具体是使用双指针的方式，利用不同的case，去改变不同的length. 以后遇到双for循环的
+     * 都应该回想起是不是可以使用双指针来进行优化for循环，降低成一个for循环
+     */
+    public int maxArea(int[] height) {
+        //求最大的长方形 = 长*高
+        int max = 0;
+        int length = height.length - 1;
+        for (int i = 0; i < length; ) {
+            //长 = length-i
+            //宽 = min(最低侧为宽)
+            int chang = (length - i);
+            int kuan = Math.min(height[length], height[i]);
+            max = Math.max(max, chang * kuan);
+            if (height[length] > height[i]) {
+                i++;
+            } else {
+                length--;
+            }
+        }
+        return max;
+    }
+
+    public String longestCommonPrefix(String[] strs) {
+        if (strs.length == 0) {
+            return "";
+        }
+        String zz = strs[0];
+        int min = zz.length();
+        for (String str : strs) {
+            int temp = str.length();
+            if (min > temp) {
+                zz = str;
+                min = temp;
+            }
+        }
+        final int length = zz.length();
+        for (int i = length; i > 0; i--) {
+            final String substring = zz.substring(0, i);
+            boolean ok = true;
+            for (String str : strs) {
+                ok = str.startsWith(substring);
+                if (!ok) {
+                    break;
+                }
+            }
+            if (ok) {
+                return substring;
+            }
+        }
+        return "";
+    }
+
+    public int searchInsert(int[] nums, int target) {
+        int index = 0;
+        for (int i = 0; i < nums.length; i++) {
+            if (nums[i] == target) {
+                return i;
+            }
+            if (target > nums[i]) {
+                index++;
+            }
+        }
+        return index;
+    }
+
     public static void main(String[] args) {
         ListNode first = new ListNode();
         {
