@@ -33,9 +33,25 @@ public class ReverseList {
 //            xx.traverse();
 //        }
         {
-            final ListNode xx = reverseList.recursion(listNode);
+            final ListNode xx = reverseList.reverseList(listNode);
             xx.traverse();
         }
+    }
+
+    public ListNode reverseList(ListNode root) {
+        if (root == null) {
+            return root;
+        }
+        ListNode tt = root;
+        ListNode prev = null;
+        while (tt != null) {
+            final ListNode next = tt.next;
+            tt.next = prev;
+            prev = tt;
+            tt = next;
+        }
+
+        return prev;
     }
 
     /**
@@ -79,48 +95,48 @@ public class ReverseList {
     }
 
 
-    /**
-     * 每次取出链表最后一个节点放到新链表上. 有些傻，颇有硬编码的意思
-     */
-    public ListNode reverseList(ListNode head) {
-        if (head == null) return null;
-        if (head.next == null) return head;
-        ListNode p = new ListNode();
-        doSet(p, head);
-        return p.next;
-    }
-
-    private void doSet(ListNode p, ListNode head) {
-        if (head == null) {
-            return;
-        }
-        if (head.next == null) {
-            p.next = head;
-            return;
-        }
-        ListNode q = head;
-        while (q.next != null) {
-            q = q.next;
-            if (q.next == null) {
-                p.next = q;
-            }
-        }
-        ListNode q1 = head;
-        ListNode tt = new ListNode();
-        ListNode f = tt;
-        while (q1.next != null) {
-            if (q1.next.next == null) {
-                q1.next = null;
-                f.next = q1;
-                break;
-            }
-            f.next = q1;
-            f = f.next;
-            q1 = q1.next;
-        }
-        head = tt.next;
-        doSet(p.next, head);
-    }
+//    /**
+//     * 每次取出链表最后一个节点放到新链表上. 有些傻，颇有硬编码的意思
+//     */
+//    public ListNode reverseList(ListNode head) {
+//        if (head == null) return null;
+//        if (head.next == null) return head;
+//        ListNode p = new ListNode();
+//        doSet(p, head);
+//        return p.next;
+//    }
+//
+//    private void doSet(ListNode p, ListNode head) {
+//        if (head == null) {
+//            return;
+//        }
+//        if (head.next == null) {
+//            p.next = head;
+//            return;
+//        }
+//        ListNode q = head;
+//        while (q.next != null) {
+//            q = q.next;
+//            if (q.next == null) {
+//                p.next = q;
+//            }
+//        }
+//        ListNode q1 = head;
+//        ListNode tt = new ListNode();
+//        ListNode f = tt;
+//        while (q1.next != null) {
+//            if (q1.next.next == null) {
+//                q1.next = null;
+//                f.next = q1;
+//                break;
+//            }
+//            f.next = q1;
+//            f = f.next;
+//            q1 = q1.next;
+//        }
+//        head = tt.next;
+//        doSet(p.next, head);
+//    }
 
     public static class ListNode {
         int val;
