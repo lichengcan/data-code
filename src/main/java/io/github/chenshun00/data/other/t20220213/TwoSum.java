@@ -18,6 +18,8 @@ public class TwoSum {
     }
 
     /**
+     * 典型的hash表解决问题的方式.
+     *
      * 这里是返回下标, 如果是要返回对于的数字，还可以使用双指针来做
      * <p>
      * 给定一个整数数组 nums和一个整数目标值 target，请你在该数组中找出 和为目标值 target 的那两个整数，并返回它们的数组下标。
@@ -41,6 +43,9 @@ public class TwoSum {
         return xx;
     }
 
+    /**
+     * 双指针解决有序数组的一个方式.
+     */
     public int[] twoSumChange(int[] nums, int target) {
         int[] xx = new int[2];
 
