@@ -415,8 +415,8 @@ public class BTree {
 
             final Node[] nodeChildren = node.children;
             if (nodeChildren != null) {
-
                 //进行分裂
+
                 leftChild.children = new Node[leftChild.numberOfNodes + 1];
                 //进行拷贝
                 System.arraycopy(nodeChildren, 0, leftChild.children, 0, leftChild.numberOfNodes + 1);
